@@ -7,28 +7,48 @@
 
 #define FORCE_CONFIG_PIN 0  // GPIO0 (BOOT button) to reset WiFi
 #define LED_PIN 2
-
-// Default values
-extern bool ENERGY_MEASURE_flag;
-extern volatile int sensorValue;
-extern float energy;
-extern bool shouldSaveConfig;
-
-// MQTT Broker Configuration
+// ========== MQTT Broker Configuration (DEFINITIONS) ==========
 const char *mqtt_broker = "broker.hivemq.com";
 const int mqtt_port = 1883;
 
-// MQTT Topics (will be created dynamically with Bot ID)
-extern String mqtt_sub_topic;
-extern String mqtt_pub_topic;
-extern String sensor_topic;
-extern String energy_topic;
+// ========== Global Variables (DEFINITIONS with initial values) ==========
+bool ENERGY_MEASURE_flag = 0;
+volatile int sensorValue = 50;
+float energy = 12.5;
+bool shouldSaveConfig = false;
+bool webPortalActive = false;
+bool communicationActive = false;
 
-// Telegram Bot ID (will be stored)
-extern String bot_id;
+// ========== MQTT Topics (DEFINITIONS - empty strings) ==========
+String mqtt_sub_topic;
+String mqtt_pub_topic;
+String energy_topic;
 
-// MQTT & WiFi Client Setup
-extern WiFiClient espClient;
-extern PubSubClient mqtt_client;
+
+
+// ========== WiFi Clients (DEFINITIONS) ==========
+WiFiClient espClient;
+PubSubClient mqtt_client(espClient);
+
+// ========== Button & LED Variables (DEFINITIONS) ==========
+unsigned long buttonPressStart = 0;
+bool buttonPressed = false;
+bool forceConfig = false;
+unsigned long lastLedToggle = 0;
+bool ledState = false;
+
+// ========== FUNCTION DECLARATIONS ==========
+bool loadConfig();
+void saveConfig();
+void saveConfigCallback();
+bool checkBotID(String entered_id);
+void connectToWiFi();
+void ConfigMode();
+void handleLEDToggle();
+void connectToMQTTBroker();
+void mqttCallback(char *topic, byte *payload, unsigned int length);
+void sensorTask();
+
+// ========== FUNCTION DEFINITIONS ==========
 
 #endif
